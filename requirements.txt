@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+python-dotenv
+pipecat-ai==0.0.67
+pipecat-ai[webrtc,deepgram,cartesia,elevenlabs,local]
+pipecat-ai-small-webrtc-prebuilt
+requests=2.32.2
+flask==3.0.3
