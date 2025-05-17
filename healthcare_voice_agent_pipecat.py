@@ -7,10 +7,8 @@ from threading import Thread
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from .env
 load_dotenv()
 
-# Import Pipecat components
 from pipecat.frames.frames import AudioRawFrame, TextFrame
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.task import PipelineTask
@@ -20,19 +18,19 @@ from pipecat.services.elevenlabs.tts import ElevenLabsTTSService
 from pipecat.transports.local.audio import LocalAudioTransport,LocalAudioTransportParams
 from pipecat.processors.frame_processor import FrameProcessor
 
-# Custom PipelineRunner to skip SIGINT on Windows
+
 class CustomPipelineRunner(PipelineRunner):
     def __init__(self):
         super().__init__()
         self._task: Optional[PipelineTask] = None
 
     def _setup_sigint(self):
-        # Skip SIGINT handling on Windows
+        
         if platform.system() != "Windows":
             super()._setup_sigint()
 
 
-# Patient profile
+
 patient_profile = {
     "patient_id": "CL-P00123",
     "full_name": "Mrs. Kavita Sharma",
@@ -45,10 +43,10 @@ patient_profile = {
     "next_followup_visit": "2025-05-20"
 }
 
-# Mock API endpoint for alerts
+
 ALERT_API_URL = "http://localhost:5000/alert"
 
-# Custom NLU Processor for Hinglish
+
 class CustomNLUProcessor(FrameProcessor):
     async def process_frame(self, frame, direction):
         if isinstance(frame, TextFrame):
@@ -61,7 +59,7 @@ class CustomNLUProcessor(FrameProcessor):
             return frame
         return frame
 
-# Dialogue Manager: Controls the conversation flow
+
 class DialogueManager:
     def __init__(self, patient_profile):
         self.state = "INIT"
@@ -133,7 +131,7 @@ class DialogueManager:
         except:
             return False
 
-# Healthcare Agent: Combines voice and conversation tools
+
 class HealthcareAgent(FrameProcessor):
     def __init__(self):
         super().__init__()
@@ -155,10 +153,9 @@ class HealthcareAgent(FrameProcessor):
 
     def setup_pipeline(self):
         try:
-            # Configure services with API keys
+            
             stt = DeepgramSTTService(
                 api_key=os.getenv("DEEPGRAM_API_KEY"),
-                #api_key=os.getenv("DEEPGRAM_API_KEY"),
                 language="en-IN"
             )
             nlu = CustomNLUProcessor()
@@ -167,13 +164,13 @@ class HealthcareAgent(FrameProcessor):
                 voice_id="2bNrEsM0omyhLiEyOwqY"
             )
             params = LocalAudioTransportParams(
-                sample_rate=16000,  # Standard for voice
-                channels=1,         # Mono audio
-                frame_size=320      # 20ms frames at 16kHz
+                sample_rate=16000,  
+                channels=1,         
+                frame_size=320      
             )            
             transport = LocalAudioTransport(params=params)
 
-            # Build the pipeline
+            
             self.pipeline = Pipeline([
                 transport.input(),
                 stt,
@@ -195,7 +192,7 @@ class HealthcareAgent(FrameProcessor):
         except Exception as e:
             print(f"Error running pipeline: {e}")
             raise
-# Main function to run the agent
+
 async def main():
     print("Starting Healthcare Voice Agent...")
     agent = HealthcareAgent()
